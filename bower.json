@@ -1,0 +1,8 @@
+{
+  "name": "ng-spring-boot",
+  "dependencies": {
+    "angular": "",
+    "angular-resource": "",
+    "bootstrap-css-only": ""
+  }
+}

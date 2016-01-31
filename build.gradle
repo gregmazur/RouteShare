@@ -1,0 +1,78 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.0.RELEASE")
+        classpath("io.spring.gradle:dependency-management-plugin:0.5.3.RELEASE")
+    }
+}
+plugins {
+    id "org.asciidoctor.convert" version "1.5.2"
+}
+group 'RouteShare'
+version '1.0-SNAPSHOT'
+
+apply plugin: "idea"
+apply plugin: "java"
+apply plugin: "spring-boot"
+apply plugin: "io.spring.dependency-management"
+
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+jar {
+    baseName = "app-route-share"
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into "static/docs"
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/snapshot' }
+}
+
+dependencies {
+    // For domain modeling + Spring Data JPA.
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile('mysql:mysql-connector-java:5.1.38')
+    compile("org.projectlombok:lombok:1.16.6")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    // Spring Data REST.
+    compile("org.springframework.boot:spring-boot-starter-data-rest")
+
+    // Spring Security.
+//    compile("org.springframework.boot:spring-boot-starter-security")
+//    compile("org.springframework.security:spring-security-data")
+
+    // Initial test dependencies.
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("junit:junit:4.12")
+
+    // Extras
+    testCompile("com.jayway.jsonpath:json-path:2.0.0")
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.0.0.RELEASE")
+    testCompile("org.springframework.security:spring-security-test")
+}
+
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    attributes 'snippets': snippetsDir
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "2.9"
+}
